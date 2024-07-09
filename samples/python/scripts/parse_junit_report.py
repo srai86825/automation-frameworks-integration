@@ -1,8 +1,3 @@
-import sys
-import os
-import xml.etree.ElementTree as ET
-import json
-
 def parse_junit_report(report_path):
     log_file = 'parse_junit_log.txt'
     with open(log_file, 'w') as log:
@@ -16,8 +11,14 @@ def parse_junit_report(report_path):
             log_print(f"Error: File not found: {report_path}")
             return
 
-        tree = ET.parse(report_path)
+        try:
+            tree = ET.parse(report_path)
+        except ET.ParseError as e:
+            log_print(f"Error parsing XML: {e}")
+            return
+        
         root = tree.getroot()
+        log_print(f"Root element: {root.tag}")
 
         test_results = []
         for testcase in root.findall('testcase'):
@@ -39,9 +40,3 @@ def parse_junit_report(report_path):
             json.dump(test_results, f, indent=4)
         
         log_print(f"Test results written to: {output_file}")
-
-if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print("Usage: python parse_junit_report.py <junit-report.xml>")
-    else:
-        parse_junit_report(sys.argv[1])
