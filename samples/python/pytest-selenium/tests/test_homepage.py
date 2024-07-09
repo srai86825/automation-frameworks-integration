@@ -5,7 +5,7 @@ from selenium.webdriver.remote.webdriver import WebDriver
 class TestsHomepage:
 
     @staticmethod
-    @pytest.mark.subid("sub-102")
+    @pytest.mark.subid("subid-102")
     def test_header_links(browser_driver: WebDriver, record_property):
         """
         Checks headers links
@@ -27,4 +27,8 @@ class TestsHomepage:
         Checks actions links for trial and demo
         """
         record_property("subid", "subid-103")
-        record_property("tes
+        record_property("testrail_result_comment", "1. Check Demo link")
+        assert browser_driver.find_element(By.XPATH, "(//*[contains(@href,'webinar/register')])[1]").is_displayed()
+
+        record_property("testrail_result_comment", "2. Check Trial link")
+        assert browser_driver.find_element(By.XPATH, "//*[@href='/get_trial_invalid_link/']").is_displayed()
