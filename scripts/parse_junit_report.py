@@ -1,24 +1,41 @@
+import sys
+import os
 import xml.etree.ElementTree as ET
 import json
-import sys
 
-def parse_junit_xml(file_path):
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f'File not found: {file_path}')
+def parse_junit_report(report_path):
+    print(f" parse_junitscript report has is Reading JUnit report from: {report_path}")
     
-    tree = ET.parse(file_path)
+    if not os.path.exists(report_path):
+        print(f"parse_junitscript report has Error: File not found: {report_path}")
+        return
+
+    tree = ET.parse(report_path)
     root = tree.getroot()
-    results = {}
-    
-    for testcase in root.findall('.//testcase'):
-        test_name = testcase.get('name')
-        subid = testcase.get('subid', 'N/A')  # Default to 'N/A' if subid is not found
-        status = 'passed' if not testcase.find('failure') else 'failed'
-        results[subid] = status
-    
-    return results
 
-if __name__ == "__main__":
-    report_path = sys.argv[1]
-    results = parse_junit_xml(report_path)
-    print(json.dumps(results))
+    test_results = []
+    for testcase in root.findall('testcase'):
+        test_case_info = {
+            'name': testcase.get('name'),
+            'classname': testcase.get('classname'),
+            'time': testcase.get('time'),
+            'status': 'passed'
+        }
+        failure = testcase.find('failure')
+        if failure is not None:
+            test_case_info['status'] = 'failed'
+            test_case_info['message'] = failure.get('message')
+            test_case_info['type'] = failure.get('type')
+        test_results.append(test_case_info)
+
+    output_file = 'test_results.json'
+    with open(output_file, 'w') as f:
+        json.dump(test_results, f, indent=4)
+    
+    print(f"parse_junitscript report has Test results written to: {output_file}")
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print("parse_junitscript report has Usage: python parse_junit_report.py <junit-report.xml>")
+    else:
+        parse_junit_report(sys.argv[1])
