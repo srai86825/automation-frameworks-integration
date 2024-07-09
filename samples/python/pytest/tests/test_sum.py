@@ -1,15 +1,17 @@
 import pytest
 
-
-def test_sum_two_numbers():
+def test_sum_two_numbers(record_property):
+    # Adding a subid for the test case
+    record_property("subid", "sub-102")
     assert 1 + 1 == 2
 
-
 def test_sum_two_decimals(record_property):
-    record_property("testrail_attachment", "sample_reports/testrail.jpg")
+    # Adding a subid for the test case
+    record_property("subid", "sub-103")
     assert 0.8 + 0.3 == 1.2
 
-
 @pytest.mark.parametrize("test_input,expected", [("3+5", 8), ("2+4", 6)])
-def test_sum_multiple_numbers(test_input, expected):
+def test_sum_multiple_numbers(record_property, test_input, expected):
+    # Adding a subid for the test case
+    record_property("subid", "sub-104")
     assert eval(test_input) == expected
