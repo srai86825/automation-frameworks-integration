@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 import json
 
 def parse_junit_report(report_path):
-    print(f" parse_junitscript report has is Reading JUnit report from: {report_path}")
+    print(f" parse_junitscript report  is Reading JUnit report from: {report_path}")
     
     if not os.path.exists(report_path):
         print(f"parse_junitscript report has Error: File not found: {report_path}")
