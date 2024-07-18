@@ -39,10 +39,7 @@ jobs:
           name: Post JUnit results to API
           command: |
             JUNIT_FILE_PATH="samples/python/pytest/reports/junit-report.xml"
-            API_URL="https://d3b8-152-59-142-184.ngrok-free.app/api/projects/integration/circleci/result/beeeb35d-1633-4ac1-a16c-a459a2d7b302"
             
-            # API_URL="http://localhost:3000/api/projects/integration/circleci/result/beeeb35d-1633-4ac1-a16c-a459a2d7b302"
-            API_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdJZCI6IjE2ODdiMTE1LWE0MzItNDQyZC1iYzAwLWQ4MzU5Mzk1NzAyOSIsInVzZXJJZCI6ImNlZTA5ZDQyLTA2YzMtNDU5OS1hODZlLTg2YzgwMTM4ZGNiOSIsImlhdCI6MTcyMTEyNjA3OH0.tRsXbvHXgXSlnRGCSiS_pDvxS5BrqH_i_WCpV4GCgaI"
             if [ -f "$JUNIT_FILE_PATH" ]; then
               echo "JUnit report file found: $JUNIT_FILE_PATH"
               CURL_COMMAND="curl -X POST $API_URL -H \"x-api-key: $API_KEY\" -F \"file=@$JUNIT_FILE_PATH\""
