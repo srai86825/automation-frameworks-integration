@@ -24,9 +24,10 @@ jobs:
       - run:
           name: Build and run the tests
           command: |
+            cd path/to/your/maven/project  # Change to the directory containing the pom.xml file
             mvn clean compile test
       - persist_to_workspace:
-          root: ./
+          root: ./path/to/your/maven/project  # Adjust the path accordingly
           paths:
             - target/TEST-junit-jupiter.xml
   post-results:
@@ -38,7 +39,7 @@ jobs:
      - run:
          name: Post JUnit results to API
          command: |
-           JUNIT_FILE_PATH="./automation-framework-integration/target/TEST-junit-jupiter.xml"
+           JUNIT_FILE_PATH="./path/to/your/maven/project/target/TEST-junit-jupiter.xml"
            API_URL="http://localhost:3000/api/projects/integration/jenkins/result/beeeb35d-1633-4ac1-a16c-a459a2d7b302"
            API_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdJZCI6IjE2ODdiMTE1LWE0MzItNDQyZC1iYzAwLWQ4MzU5Mzk1NzAyOSIsInVzZXJJZCI6ImNlZTA5ZDQyLTA2YzMtNDU5OS1hODZlLTg2YzgwMTM4ZGNiOSIsImlhdCI6MTcyMTEyNjA3OH0.tRsXbvHXgXSlnRGCSiS_pDvxS5BrqH_i_WCpV4GCgaI"
            if [ -f "$JUNIT_FILE_PATH" ]; then
