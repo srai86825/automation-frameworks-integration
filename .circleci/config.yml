@@ -43,9 +43,11 @@ jobs:
             API_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdJZCI6IjE2ODdiMTE1LWE0MzItNDQyZC1iYzAwLWQ4MzU5Mzk1NzAyOSIsInVzZXJJZCI6ImNlZTA5ZDQyLTA2YzMtNDU5OS1hODZlLTg2YzgwMTM4ZGNiOSIsImlhdCI6MTcyMTEyNjA3OH0.tRsXbvHXgXSlnRGCSiS_pDvxS5BrqH_i_WCpV4GCgaI"
             if [ -f "$JUNIT_FILE_PATH" ]; then
               echo "JUnit report file found: $JUNIT_FILE_PATH"
-              curl -X POST $API_URL \
-                -H "x-api-key: $API_KEY" \
-                -F "file=@$JUNIT_FILE_PATH"
+              CURL_COMMAND="curl -X POST $API_URL -H \"x-api-key: $API_KEY\" -F \"file=@$JUNIT_FILE_PATH\""
+              echo "Executing curl command: $CURL_COMMAND"
+              RESPONSE=$(eval $CURL_COMMAND)
+              echo "API Response:"
+              echo "$RESPONSE"
             else
               echo "JUnit report file not found: $JUNIT_FILE_PATH"
               exit 1
