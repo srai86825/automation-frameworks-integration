@@ -36,7 +36,7 @@ jobs:
       - attach_workspace:
           at: ./samples/python/pytest
       - run:
-          name: Post JUnit results to API
+          name: Post JUnit results to OyeTest
           command: |
             JUNIT_FILE_PATH="samples/python/pytest/reports/junit-report.xml"
             
@@ -45,7 +45,7 @@ jobs:
               CURL_COMMAND="curl -X POST $API_URL -H \"x-api-key: $API_KEY\" -F \"file=@$JUNIT_FILE_PATH\""
               echo "Executing curl command: $CURL_COMMAND"
               RESPONSE=$(eval $CURL_COMMAND)
-              echo "API Response:"
+              echo "OyeTest Response:"
               echo "$RESPONSE"
             else
               echo "JUnit report file not found: $JUNIT_FILE_PATH"
