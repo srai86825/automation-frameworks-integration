@@ -1,6 +1,6 @@
 ![Tests](https://github.com/gurock/automation-frameworks-integration/actions/workflows/run-all.yml/badge.svg)
 
-# TestRail test automation frameworks integration
+# OyeTest test automation frameworks integration
 Sample projects on how to integrate your favorite test automation frameworks with TestRail using the TestRail CLI.
 
 For more information on how to use the TestRail CLI, please refer to the [TestRail CLI documentation](https://support.gurock.com/hc/en-us/articles/7146548750868).
