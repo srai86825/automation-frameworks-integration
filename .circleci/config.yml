@@ -3,54 +3,53 @@ working_directory: ~/automation-framework-integration
 jobs:
   build-and-test:
     docker:
-      - image: cimg/openjdk:15.0
+      - image: circleci/python:3.10
     steps:
-      - checkout  # Performs code checkout
+      - checkout  # Perform code checkout
       - run:
-          name: Install Google Chrome
+          name: Set up virtual environment
           command: |
-            sudo apt-get update && \
-            sudo apt-get install -y wget gnupg && \
-            wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add - && \
-            echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list && \
-            sudo apt-get update && \
-            sudo apt-get install -y google-chrome-stable
+            cd samples/python/pytest
+            python -m venv ./venv
       - run:
-          name: Install ChromeDriver
+          name: Install dependencies
           command: |
-            sudo apt-get install -yqq unzip && \
-            wget -O /tmp/chromedriver.zip http://chromedriver.storage.googleapis.com/109.0.5414.74/chromedriver_linux64.zip && \
-            sudo unzip /tmp/chromedriver.zip -d /usr/local/bin/
+            cd samples/python/pytest
+            . ./venv/bin/activate
+            pip install -r requirements.txt
       - run:
           name: Build and run the tests
           command: |
-            cd path/to/your/maven/project  # Change to the directory containing the pom.xml file
-            mvn clean compile test
+            cd samples/python/pytest
+            . ./venv/bin/activate
+            pytest --junitxml=reports/junit-report.xml ./tests || true
+            echo "JUnit report generated:"
+            ls -l reports/
       - persist_to_workspace:
-          root: ./path/to/your/maven/project  # Adjust the path accordingly
+          root: samples/python/pytest
           paths:
-            - target/TEST-junit-jupiter.xml
+            - reports/junit-report.xml
   post-results:
     docker:
-      - image: cimg/python:3.11
+      - image: circleci/python:3.10
     steps:
-     - attach_workspace:
-         at: ./automation-framework-integration
-     - run:
-         name: Post JUnit results to API
-         command: |
-           JUNIT_FILE_PATH="./path/to/your/maven/project/target/TEST-junit-jupiter.xml"
-           API_URL="http://localhost:3000/api/projects/integration/jenkins/result/beeeb35d-1633-4ac1-a16c-a459a2d7b302"
-           API_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdJZCI6IjE2ODdiMTE1LWE0MzItNDQyZC1iYzAwLWQ4MzU5Mzk1NzAyOSIsInVzZXJJZCI6ImNlZTA5ZDQyLTA2YzMtNDU5OS1hODZlLTg2YzgwMTM4ZGNiOSIsImlhdCI6MTcyMTEyNjA3OH0.tRsXbvHXgXSlnRGCSiS_pDvxS5BrqH_i_WCpV4GCgaI"
-           if [ -f "$JUNIT_FILE_PATH" ]; then
-             echo "JUnit report file found: $JUNIT_FILE_PATH"
-             curl -X POST $API_URL \
-               -H "x-api-key: $API_KEY" \
-               -F "file=@$JUNIT_FILE_PATH"
-           else
-             echo "JUnit report file not found: $JUNIT_FILE_PATH"
-             exit 1
-           fi
+      - attach_workspace:
+          at: ./samples/python/pytest
+      - run:
+          name: Post JUnit results to API
+          command: |
+            JUNIT_FILE_PATH="samples/python/pytest/reports/junit-report.xml"
+            API_URL="http://localhost:3000/api/projects/integration/jenkins/result/beeeb35d-1633-4ac1-a16c-a459a2d7b302"
+            API_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdJZCI6IjE2ODdiMTE1LWE0MzItNDQyZC1iYzAwLWQ4MzU5Mzk1NzAyOSIsInVzZXJJZCI6ImNlZTA5ZDQyLTA2YzMtNDU5OS1hODZlLTg2YzgwMTM4ZGNiOSIsImlhdCI6MTcyMTEyNjA3OH0.tRsXbvHXgXSlnRGCSiS_pDvxS5BrqH_i_WCpV4GCgaI"
+            if [ -f "$JUNIT_FILE_PATH" ]; then
+              echo "JUnit report file found: $JUNIT_FILE_PATH"
+              curl -X POST $API_URL \
+                -H "x-api-key: $API_KEY" \
+                -F "file=@$JUNIT_FILE_PATH"
+            else
+              echo "JUnit report file not found: $JUNIT_FILE_PATH"
+              exit 1
+            fi
 
 workflows:
   sample:
