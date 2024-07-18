@@ -16,9 +16,14 @@ jobs:
             sudo apt-get update && \
             sudo apt-get install -y google-chrome-stable
       - run:
+          name: Install ChromeDriver
+          command: |
+            sudo apt-get install -yqq unzip && \
+            wget -O /tmp/chromedriver.zip http://chromedriver.storage.googleapis.com/109.0.5414.74/chromedriver_linux64.zip && \
+            unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
+      - run:
           name: Build and run the tests
           command: |
-            chmod 777 drivers/linux/chromedriver
             mvn clean compile test
       - persist_to_workspace:
           root: ./
