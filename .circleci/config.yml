@@ -1,78 +1,50 @@
 version: 2.1
-
+orbs:
+  browser-tools: circleci/browser-tools@1.4.1
+working_directory: ~/automation-framework-integration
 jobs:
-  checkout:
+  build-and-test:
     docker:
-      - image: circleci/python:3.10
+      - image: cimg/openjdk:15.0
     steps:
-      - checkout
-
-  setup-venv:
-    docker:
-      - image: circleci/python:3.10
-    steps:
-      - checkout
+      - browser-tools/install-browser-tools:
+          chrome-version: 109.0.5414.74
+      - checkout  # Performs code checkout
       - run:
-          name: Setup virtual environment
+          name: Build and run the tests
           command: |
-            cd samples/python/pytest
-            python -m venv ./venv
-
-  execute-tests:
-    docker:
-      - image: circleci/python:3.10
-    steps:
-      - checkout
-      - run:
-          name: Execute automated tests
-          command: |
-            cd samples/python/pytest
-            . ./venv/bin/activate
-            pip install -r requirements.txt
-            pytest --junitxml=reports/junit-report.xml ./tests || true
-            echo "JUnit report generated:"
-            ls -l reports/
-
+            chmod 777 drivers/linux/chromedriver
+            mvn clean compile test
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - target/TEST-junit-jupiter.xml
   post-results:
     docker:
-      - image: circleci/python:3.10
-    environment:
-      API_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdJZCI6IjE2ODdiMTE1LWE0MzItNDQyZC1iYzAwLWQ4MzU5Mzk1NzAyOSIsInVzZXJJZCI6ImNlZTA5ZDQyLTA2YzMtNDU5OS1hODZlLTg2YzgwMTM4ZGNiOSIsImlhdCI6MTcyMTEyNjA3OH0.tRsXbvHXgXSlnRGCSiS_pDvxS5BrqH_i_WCpV4GCgaI"
-      API_URL: "http://localhost:3000/api/projects/integration/jenkins/result/beeeb35d-1633-4ac1-a16c-a459a2d7b302"
+      - image: cimg/python:3.11
     steps:
-      - checkout
-      - run:
-          name: Post results
-          command: |
-            cd samples/python/pytest
-            junitFilePath="reports/junit-report.xml"
-            
-            if [ -f "${junitFilePath}" ]; then
-                echo "JUnit report file found: ${junitFilePath}"
-                
-                response=$(curl -X POST ${API_URL} \
-                  -H "x-api-key: ${API_KEY}" \
-                  -F "file=@${junitFilePath}")
-
-                echo "API Response:"
-                echo "${response}"
-                
-            else
-                echo "JUnit report file not found: ${junitFilePath}"
-                exit 1
-            fi
+     - attach_workspace:
+         at: ./automation-framework-integration
+     - run:
+         name: Post JUnit results to API
+         command: |
+           JUNIT_FILE_PATH="./automation-framework-integration/target/TEST-junit-jupiter.xml"
+           API_URL="http://localhost:3000/api/projects/integration/jenkins/result/beeeb35d-1633-4ac1-a16c-a459a2d7b302"
+           API_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdJZCI6IjE2ODdiMTE1LWE0MzItNDQyZC1iYzAwLWQ4MzU5Mzk1NzAyOSIsInVzZXJJZCI6ImNlZTA5ZDQyLTA2YzMtNDU5OS1hODZlLTg2YzgwMTM4ZGNiOSIsImlhdCI6MTcyMTEyNjA3OH0.tRsXbvHXgXSlnRGCSiS_pDvxS5BrqH_i_WCpV4GCgaI"
+           if [ -f "$JUNIT_FILE_PATH" ]; then
+             echo "JUnit report file found: $JUNIT_FILE_PATH"
+             curl -X POST $API_URL \
+               -H "x-api-key: $API_KEY" \
+               -F "file=@$JUNIT_FILE_PATH"
+           else
+             echo "JUnit report file not found: $JUNIT_FILE_PATH"
+             exit 1
+           fi
 
 workflows:
-  version: 2
   sample:
     jobs:
-      - checkout
-      - setup-venv:
-          requires:
-            - checkout
-      - execute-tests:
-          requires:
-            - setup-venv
+      - build-and-test
       - post-results:
           requires:
-            - execute-tests
+            - build-and-test
