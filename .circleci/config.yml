@@ -40,8 +40,8 @@ jobs:
           command: |
             JUNIT_FILE_PATH="samples/python/pytest/reports/junit-report.xml"
             
-            API_URL="https://5fd6-157-42-204-230.ngrok-free.app/api/projects/integration/jenkins/result/beeeb35d-1633-4ac1-a16c-a459a2d7b302"
-            # API_URL="http://localhost:3000/api/projects/integration/jenkins/result/beeeb35d-1633-4ac1-a16c-a459a2d7b302"
+            API_URL="https://5fd6-157-42-204-230.ngrok-free.app/api/projects/integration/circleci/result/beeeb35d-1633-4ac1-a16c-a459a2d7b302"
+            # API_URL="http://localhost:3000/api/projects/integration/circleci/result/beeeb35d-1633-4ac1-a16c-a459a2d7b302"
             API_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdJZCI6IjE2ODdiMTE1LWE0MzItNDQyZC1iYzAwLWQ4MzU5Mzk1NzAyOSIsInVzZXJJZCI6ImNlZTA5ZDQyLTA2YzMtNDU5OS1hODZlLTg2YzgwMTM4ZGNiOSIsImlhdCI6MTcyMTEyNjA3OH0.tRsXbvHXgXSlnRGCSiS_pDvxS5BrqH_i_WCpV4GCgaI"
             if [ -f "$JUNIT_FILE_PATH" ]; then
               echo "JUnit report file found: $JUNIT_FILE_PATH"
