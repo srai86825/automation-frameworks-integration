@@ -7,7 +7,7 @@ env:
   global:
     - API_URL=${API_URL}
     - API_KEY=${API_KEY}
-    - JUNIT_FILE_PATH="samples/python/pytest/reports/junit-report.xml"
+    - JUNIT_FILE_PATH="reports/junit-report.xml"
 
 before_install:
   - python -m venv venv
@@ -31,7 +31,7 @@ after_script:
     echo "Current working directory:"
     pwd
     echo "Listing files in the reports directory:"
-    ls -l samples/python/pytest/reports
+    ls -l reports/ || echo "Reports directory not found"
     echo "Checking if JUnit report file exists at $JUNIT_FILE_PATH"
     if [ -f "$JUNIT_FILE_PATH" ]; then
       echo "JUnit report file found: $JUNIT_FILE_PATH"
