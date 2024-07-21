@@ -1,0 +1,39 @@
+dist: xenial
+language: python
+python:
+  - "3.9"
+
+env:
+  global:
+    - JUNIT_FILE_PATH="samples/python/pytest/reports/junit-report.xml"
+
+before_install:
+  - python -m venv venv
+  - source venv/bin/activate
+  - pip install -r requirements.txt
+
+install:
+  - sudo apt-get update
+  - sudo apt-get install -y curl
+
+script:
+  - cd samples/python/pytest
+  - python -m venv ./venv
+  - source ./venv/bin/activate
+  - pip install -r requirements.txt
+  - pytest --junitxml=reports/junit-report.xml ./tests || true
+  - echo "JUnit report generated:"
+  - ls -l reports/
+
+after_script:
+  - |
+    if [ -f "$JUNIT_FILE_PATH" ]; then
+      echo "JUnit report file found: $JUNIT_FILE_PATH"
+      CURL_COMMAND="curl -X POST $API_URL -H \"x-api-key: $API_KEY\" -F \"file=@$JUNIT_FILE_PATH\""
+      echo "Executing curl command: $CURL_COMMAND"
+      RESPONSE=$(eval $CURL_COMMAND)
+      echo "API Response:"
+      echo "$RESPONSE"
+    else
+      echo "JUnit report file not found: $JUNIT_FILE_PATH"
+      exit 1
