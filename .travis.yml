@@ -5,6 +5,8 @@ python:
 
 env:
   global:
+    - API_URL=${API_URL}
+    - API_KEY=${API_KEY}
     - JUNIT_FILE_PATH="samples/python/pytest/reports/junit-report.xml"
 
 before_install:
@@ -26,6 +28,11 @@ script:
 
 after_script:
   - |
+    echo "Current working directory:"
+    pwd
+    echo "Listing files in the reports directory:"
+    ls -l samples/python/pytest/reports
+    echo "Checking if JUnit report file exists at $JUNIT_FILE_PATH"
     if [ -f "$JUNIT_FILE_PATH" ]; then
       echo "JUnit report file found: $JUNIT_FILE_PATH"
       CURL_COMMAND="curl -X POST $API_URL -H \"x-api-key: $API_KEY\" -F \"file=@$JUNIT_FILE_PATH\""
