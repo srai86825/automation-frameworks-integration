@@ -26,6 +26,8 @@ script:
 
 after_script:
   - |
+    echo "API_URL is $API_URL"
+    echo "API_KEY is $API_KEY"
     echo "Current working directory:"
     pwd
     echo "Listing files in the reports directory:"
