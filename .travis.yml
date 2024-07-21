@@ -7,7 +7,7 @@ env:
   global:
     - API_URL=${API_URL}
     - API_KEY=${API_KEY}
-    - JUNIT_FILE_PATH="samples/python/pytest/reports/junit-report.xml"
+    - JUNIT_FILE_PATH="reports/junit-report.xml"
 
 before_install:
   - python -m venv venv
